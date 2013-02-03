@@ -101,5 +101,23 @@ The call to the loader simply calls `loader.start()`:
     loader.start();
 });
 ```
-### loader.js
 
+### The loading process and loader.js
+Before we look at the code of `loader.js` we describe the outline of the loading process. RequireJS needs to 
+figure out the loading order of the various modules. Clearly the Marionette Application must be loaded first and it must not 
+depend on any other module. This allows us to pass the App object to any other module that uses the `addInitializer` functionality before the loader starts the Application. 
+We must also load and start all the controllers and all the routers before `Backbone.history.start()` is called.
+Once the App is loaded it can be passed down to all subsequently loaded modules 
+(specifically controllers) and then started using `App.start()`. 
+The full loading order is therefore (--> means "loads" or "depends on"):
+
+````
+    main.js       --> loader.js
+    loader.js     --> app.js
+    loader.js     --> controller.js 
+    loader.js     --> router.js
+    controller.js --> app.js (dosn't load anything since loader.js already loaded the app)
+    controller.js --> some_view.js
+    controller.js --> some_model.js
+    some_view.js  --> template
+````
