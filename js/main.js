@@ -5,6 +5,9 @@ requirejs.config({
     baseUrl: '/',
     waitSeconds: 3000,
     shim: {
+        'jquery': {
+            exports:'$'
+        },
         'underscore': {
             exports: '_'
         },

@@ -1,7 +1,7 @@
-How we built TodoMVC - Example
+﻿How we built TodoMVC - Example
 ==============================
 
-#Prologue
+# Prologue
 [TodoMVC](http://addyosmani.github.com/todomvc/) is an internet project which offers
 several implementations to a well defined application using various popular 
 JavaScript MV* frameworks. We have implemented TodoMVC using [Backbone](http://backbonejs.org/) and [Marionette](http://marionettejs.com/) 
@@ -11,7 +11,7 @@ concepts of the aforementioned frameworks and the flow of the TodoMVC applicatio
 and explain the various decisions we took while developing the TodoMVC application. Please feel free to leave your comments
 and text edits in the [issues](https://github.com/BorisKozo/TodoMVC-Example/issues) section.
 
-#Code Structure
+# Code Structure
 Before we decided on the structure of the application we thought of the build and deployment process.
 We had several possible options:
 
@@ -41,7 +41,11 @@ uses CommonJS style modules). We eventually decided to go with AMD style modules
 * There is an optimizer which comes with RequireJS that allows compilation of a single JavaScript file for production mode.
 
 Selecting AMD style modules using RequireJS as our modules system allowed us to use a simple directory structure
-which is aligned with the TodoMVC specifications. The basic directory structure for our application is therefore:
+which is aligned with the TodoMVC specifications. 
+
+### Directory Structure
+
+The basic directory structure for our application is:
 ````
 |
 |- lib
@@ -55,6 +59,47 @@ which is aligned with the TodoMVC specifications. The basic directory structure 
 |  |- main.js
 |  |- app.js
 |- css
+|- assets
 |- index.html
 ````
+(Note that only the main files are displayed).
+
+In the root folder we currently have only one file which is `index.html`. Since we are using 
+RequireJS, the content of the `index.html` file is quite simple. We have the stylesheet and the base script of TodoMVC, 
+and some basic layouting of our application (a section and a footer). The most important element is the last
+script tag 
+
+    <script data-main="js/main" src="lib/require.js"></script>
+
+It tells RequireJS to load a file named `main.js` from the `js` directory using the RequireJS script from the lib directory.
+More on `main.js` in the next section.
+
+The lib directory contains all the third party libraries we are using. At this point we added
+Backbone, [Underscore](http://underscorejs.org), and [jQuery](http://jquery.com/) which are dependencies of Backbone,
+RequireJS and Marionette.
+
+The `js` directory contains all the mini-apps (sometimes called module-apps) directories and all the JavaScript 
+which is common in all the mini-apps. For example, todo-list is a mini-app and it contains folders for the two main
+Backbone constructs: models and views (we regard Backbone collections as models but it is possible to create a separate directory).
+We discuss the folder structure of a single mini-app in detail in one of the next sections.
+
+The `assets` directory is a requirement of the TodoMVC specification and is not important for this discussion. It contains
+the resources needed by the specification to support the common look and feel of the TodoMVC application.
+
+### main.js
+As we mentioned above, `main.js` is the first file that is loaded by the browser when our application starts.
+This file contains the configuration for RequireJS in a `requirejs.config({})` call.
+The first thing we define is the `baseUrl` , the `shims`, and the `paths` of the application. The `baseUrl` determines
+the base path in all the non-relative paths used to require modules. The `shims` define the order of loading for all the non-AMD modules we are loading.
+In our application we load jQuery, Underscore, Backbone, and Marionette from the lib directory. RequireJS makes sure that all the shims are loaded in
+the old fashioned script tag style in your final HTML page and that all the files are in the correct order (based on the dependencies in the code).  
+
+After the call to `requirejs.config()` we delegate our call to the `loader`. This step is not mandatory but we wanted to keep `main.js` clean of any logic.
+The call to the loader simply calls `loader.start()`:
+```js
+ require(['js/loader', function (loader) {
+    loader.start();
+});
+```
+### loader.js
 
