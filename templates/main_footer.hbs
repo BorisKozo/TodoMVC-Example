@@ -1,0 +1,17 @@
+﻿<!-- This should be `0 items left` by default -->
+<span id="todo-count">
+  <strong>{{unfinishedItemsCount}}</strong> {{itemString}} left
+</span>
+<!-- Remove this if you don't implement routing -->
+<ul id="filters">
+  <li>
+    <a class="selected filter-all" href="#/">All</a>
+  </li>
+  <li>
+    <a href="#/active" class="filter-active">Active</a>
+  </li>
+  <li>
+    <a href="#/completed" class="filter-completed">Completed</a>
+  </li>
+</ul>
+<button id="clear-completed" style="display:none">Clear completed ({{finishedItemsCount}})</button>
