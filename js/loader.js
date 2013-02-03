@@ -5,7 +5,7 @@ define(['require', './app'],
         'use strict';
         var loader = {
             start: function () {
-                require(['./controller', './router'], function (controller) {
+                require(['./todo-list/controller', './todo-list/router'], function (controller) {
                     //Load and start all the controllers
                     controller.start();
                     App.start();

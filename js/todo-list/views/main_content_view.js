@@ -1,7 +1,7 @@
 ﻿/*global define*/
 
 
-define(['backbone', 'marionette', 'underscore', 'hbs!templates/main_content', './todo_item_view', './../models/todo_item_collection', './../controller'],
+define(['backbone', 'marionette', 'underscore', 'hbs!./templates/main_content', './todo_item_view', './../models/todo_item_collection', './../controller'],
     function (Backbone, Marionette, _, contentTemplate, TodoItemView, TodoItemCollection, controller) {
         'use strict';
         var ContentView = Marionette.CompositeView.extend({

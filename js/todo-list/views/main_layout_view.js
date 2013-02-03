@@ -1,6 +1,6 @@
 ﻿/*global define*/
 
-define(['marionette', 'hbs!templates/main_layout', 'js/views/main_header_view', 'js/views/main_content_view', 'js/views/main_footer_view', './../controller'],
+define(['marionette', 'hbs!./templates/main_layout', './main_header_view', './main_content_view', './main_footer_view', './../controller'],
     function (Marionette, layoutTemplate, MainHeaderView, MainContentView, MainFooterView, controller) {
         'use strict';
         var SlideAnimationDuration = 200, MainLayoutView = Marionette.Layout.extend({

@@ -1,7 +1,7 @@
 ﻿/*global define*/
 
-define(['backbone', 'marionette', 'underscore', './app', './models/todo_item_collection'],
-    function (Backbone, Marionette, _, App, TodoItemCollection) {
+define(['require','backbone', 'marionette', 'underscore', 'js/app', './models/todo_item_collection'],
+    function (require, Backbone, Marionette, _, App, TodoItemCollection) {
         'use strict';
         var Controller = Marionette.Controller.extend({
             vent: _.extend({}, Backbone.Events),
@@ -34,7 +34,7 @@ define(['backbone', 'marionette', 'underscore', './app', './models/todo_item_col
                     todosCollection = new TodoItemCollection(),
                     todoPromise = todosCollection.fetch();
 
-                require(['js/views/main_layout_view', 'js/views/footer_view'], function (MainLayoutView, FooterView) {
+                require(['./views/main_layout_view', './views/footer_view'], function (MainLayoutView, FooterView) {
                     App.section.show(new MainLayoutView({ todosCollection: todosCollection }));
                     App.footer.show(new FooterView());
                     todoPromise.done(function () {

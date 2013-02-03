@@ -1,6 +1,6 @@
 ﻿/*global define*/
 
-define(['marionette', 'hbs!templates/footer'], function (Marionette, footerTemplate) {
+define(['marionette', 'hbs!./templates/footer'], function (Marionette, footerTemplate) {
     'use strict';
     var FooterView = Marionette.ItemView.extend({
         template: footerTemplate
