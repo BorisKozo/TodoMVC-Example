@@ -2,6 +2,9 @@
   "name": "myTodoMVC",
   "version": "0.0.1",
   "devDependencies": {
-	"requirejs":"*"
+	"requirejs":"*",
+	"wd":"0.0.30",
+	"mocha":"1.8.1",
+	"zombie":"1.4.1"
   }
 }
