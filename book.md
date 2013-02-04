@@ -181,6 +181,73 @@ we can see that the template is loaded trough the `define` statement of the pare
 much like the sub-views.
 
 ```js
-    define(['marionette', 'hbs!./templates/main_layout', './main_header_view', './main_content_view', './main_footer_view', './../controller'],
-        function (Marionette, layoutTemplate, MainHeaderView, MainContentView, MainFooterView, controller) {
+    define(['marionette', 'hbs!./templates/main_layout', './main_header_view', 
+            './main_content_view', './main_footer_view', './../controller'],
+        function (Marionette, layoutTemplate, MainHeaderView, 
+                  MainContentView, MainFooterView, controller) {
 ```
+
+After the parent view is loaded it is rendered by Backbone using the `render` function. 
+Marionette allows you to perform some logic right after the view is rendered by calling
+`onRender` function (similar to what you would expect in any .NET control). In the 
+`onRender` function the `el` of your view is ready and you are able to show/render
+all the sub-views. In the case of our `MainLayoutView` we create and show three sub-views 
+into the internal regions:
+
+```js
+    onRender: function () {
+        this.header.show(new MainHeaderView());
+        this.content.show(new MainContentView({ collection: this.options.todosCollection }));
+        this.footer.show(new MainFooterView());
+    }
+```
+
+We can see that the `TodoItemCollection` that was instantiated in the controller 
+is passed on to the appropriate sub-view. The `MainContentView` is of type `Marionette.CompositeView` and
+it is responsible for maintaining the correct state of the collection within our application.
+This is the place to mentions the two possible approaches of instantiating and passing your
+collections and models. The first approach is the one we take in this application. The collection
+is instantiated by the controller and passed on only to the view which is responsible for all 
+the collection operations (i.e. `MainContentView`). To convey various events of the collection
+we use the controller as the EventBus through the `vent` property which is an extension of
+`Backbone.Events` object.
+
+```js
+     var Controller = Marionette.Controller.extend({
+        vent: _.extend({}, Backbone.Events),
+```
+
+This approach is more of the OO style because the collection remains 'isolated' from 
+all other objects except the one which encapsulates it. The same approach works for models
+encapsulated in `Marionette.ItemView` or `Marionette.CompositeView`.
+The second approach is to instantiate the collection (or model) in the controller but pass it to
+any view or module that needs to track the events of that collection. In this approach
+the collection itself is the EventBus (`Backbone.Collection` already extends `Backbone.Events` so
+the collection instance itself is the vent). The benefit of this approach is that
+every module has an easy access to the collection and it does not need to route the 
+logic through a common event bus. For our project we took the first approach.
+
+### Template Loading
+
+One of the key aspects in a Backbone application is managing templates for the views.
+For our implementation of TodoMVC we selected Handlebars as our templating framework.
+The nice thing about this selection is that there is a plugin which allows RequireJS
+to load and compile the templates as if they were regular script files. The plugin is
+developed by Alex Slexton and is simply named [require-handlebars-plugin](https://github.com/SlexAxton/require-handlebars-plugin).
+From now on we refer to the plugin by the friendly name `hbs`. To use the plugin we added
+```js
+    hbs: { disableI18n: true }
+```
+to the `requirejs.config()` call so that the plugin internal i18n interpreter isn't loaded. 
+We also added the plugin main file `hbs.js` and all of its dependencies (`i18nprecompile.js` and `json2.js`)
+to the `lib` directory and into the `path` attribute of `requirejs.config()`. Now we are ready 
+to load the templates from our views. To load a template we created our template files with the extension
+`.hbs` within the `templates` directory.  Let's revisit the module definition of the `MainLayoutView`.
+The second parameter of the `define` statement (`'hbs!./templates/main_layout'`) tells the `hbs` plugin
+to load the file `main_layout.hbs` in the relative directory `templates`. The `!` notation tells RequireJS
+to use the plugin for loading the file. In the appropriate variable of the `define` callback (i.e. `layoutTemplate`)
+we get the compiled Handlebars template. This is very good because the `template` property of a Marionette view 
+expects you to set it to a compiled template. Voila! Your template is now loaded just as needed and cached by the RequireJS
+internal caching mechanism. 
+
+
