@@ -250,4 +250,13 @@ we get the compiled Handlebars template. This is very good because the `template
 expects you to set it to a compiled template. Voila! Your template is now loaded just as needed and cached by the RequireJS
 internal caching mechanism. 
 
+# Application Logic - Deep Dive
+In this section we will deep dive into the implementation of the various views, collections, 
+and models of our application. We will explain the main logic and the considerations we took
+to make the logic as it is implemented. 
+
+### Outline
+The following image depicts the outline of our application in terms of views/templates:
+![Views Layout](/images/views.png)
+
 
