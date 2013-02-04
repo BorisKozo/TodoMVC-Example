@@ -214,7 +214,7 @@ we use the controller as the EventBus through the `vent` property which is an ex
 
 ```js
      var Controller = Marionette.Controller.extend({
-        vent: _.extend({}, Backbone.Events),
+        vent: _.extend({}, Backbone.Events)
 ```
 
 This approach is more of the OO style because the collection remains 'isolated' from 
@@ -258,5 +258,46 @@ to make the logic as it is implemented.
 ### Outline
 The following image depicts the outline of our application in terms of views/templates:
 ![Views Layout](/images/views.png)
+
+
+The application (`Marionette.Application`) splits the viewable area into two regions.
+The footer region contains the `footer_view` view (`Marionette.ItemView`) which displays
+three lines of text. This view is not important to the discussion. The main `section` region
+which contains the `main_layout` (`Marionette.Layout`) view. `main_layout` in itself
+splits the main area into three sub-views. 
+
+`main_header_view` (`Marionette.ItemView`) is responsible for
+the input line that adds a new 'todo'. Note that the `main_header_view` view is the only visible view when
+there are no todos in the list. This is enforced by the logic within `main_layout_view` according to
+the specifications of the TodoMVC application. The function `updateSubViews` is responsible for showing
+and hiding the footer and the content according to the state of the todos collection. `_isDataVisible` is an
+internal property which keeps track of the current visibility of these two regions.
+
+```js
+            updateSubViews: function (data) {
+                if (data.collection.length === 0 && this._isDataVisible) {
+                    this.ui.footer.hide(SlideAnimationDuration);
+                    this.ui.content.hide(SlideAnimationDuration);
+                    this._isDataVisible = false;
+                    return;
+                }
+
+                if (!this._isDataVisible && data.collection.length > 0) {
+                    this.ui.footer.show(SlideAnimationDuration);
+                    this.ui.content.show(SlideAnimationDuration);
+                    this._isDataVisible = true;
+                }
+            }
+```
+
+`main_content_view` (`Marionette.CompositeView`) is responsible for rendering the entire
+todos list. The model part of the composite view (the part that doesn't contain the collection) contains
+only the toggle button which located to the left of the `main_header_view` input box. As we mention above
+the `main_content_view` is responsible for performing all the operations on the collection and triggering the 
+appropriate events on the EventBus. We decided to trigger the events from the view and not directly from the 
+collection to allow some decoupling between the collection and the controller. In fact the guideline we used
+is that the collections/models are not dependant on anything (except for inner dependencies required by Marionette).
+
+`main_footer_view` (`Marionette.ItemView`) is responsible for displaying the footer of the list.
 
 

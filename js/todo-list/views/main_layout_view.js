@@ -17,22 +17,22 @@ define(['marionette', 'hbs!./templates/main_layout', './main_header_view', './ma
             },
 
             initialize: function () {
-                controller.vent.on('todosUpdated', this.updateFooter, this);
-                this.isDataVisible = false;
+                controller.vent.on('todosUpdated', this.updateSubViews, this);
+                this._isDataVisible = false;
             },
 
-            updateFooter: function (data) {
-                if (data.collection.length === 0 && this.isDataVisible) {
+            updateSubViews: function (data) {
+                if (data.collection.length === 0 && this._isDataVisible) {
                     this.ui.footer.hide(SlideAnimationDuration);
                     this.ui.content.hide(SlideAnimationDuration);
-                    this.isDataVisible = false;
+                    this._isDataVisible = false;
                     return;
                 }
 
-                if (!this.isDataVisible && data.collection.length > 0) {
+                if (!this._isDataVisible && data.collection.length > 0) {
                     this.ui.footer.show(SlideAnimationDuration);
                     this.ui.content.show(SlideAnimationDuration);
-                    this.isDataVisible = true;
+                    this._isDataVisible = true;
                 }
             },
 
