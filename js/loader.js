@@ -1,15 +1,15 @@
 ﻿/*global define*/
 
-define(['require', './app', './todo-list/controller', './todo-list/router'],
-    function (require, App) {
+define(['require', 'jquery', './app', './todo-list/controller'],
+    function (require, $, App) {
         'use strict';
         var loader = {
             start: function () {
                 var controller = require('./todo-list/controller');
-                    //Load and start all the controllers
-                    controller.start();
+                //Load and start all the controllers
+                $.when(controller.start()).then(function () {
                     App.start();
-                
+                });
             }
         };
         return loader;

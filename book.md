@@ -121,3 +121,66 @@ The full loading order is therefore (--> means "loads" or "depends on"):
     controller.js --> some_model.js
     some_view.js  --> template
 ````
+
+### mini-app internal code structure
+Each mini-app represents a closed functionality of the application. 
+The external API of the mini-app is the `Marionette.Controller` which is responsible to creating and loading all the models and views.
+The controller serves as an internal and external events vent for all the events within the miniapp. The mini-app directory contains the
+`views` and the `models` directories. The `views` directory contains all the modules which return the constructor function for any kind of Marionette view (e.g. `Marionette.CompositeView`).
+Inside the `views` directory we have the `templates` directory which contains all the templates consumed by the views of the mini-app. The `models` directory contains all the modules
+which return either `Backbone.Model` or `Backbone.Collection` constructor functions. It is also possible to separate each construct to its own folder but since they are so tightly coupled
+together we decided to put everything in one folder. 
+(Note: A constructor function is what you get when you call Backbone.XXX.extend({}).)
+
+# Application Flow
+### Loading your mini-apps
+We start the discussion of this section after the loader loads all the controllers of all the mini-apps.
+At this point the loader calls the `controller.start()` function on each controller which, in turn, returns a jQuery promise.
+The loader waits until all the promises are resolved and then starts the application. We dive into the load flow of the todo-list controller
+as this flow should be similar for all controllers. In the controller `start` function we do two main things:
+
+* The collections are created and loaded via the `fetch` function.
+
+* The topmost views are loaded via the async `require` statement.
+
+* The router of the mini-app is loaded via the async `require` statement.
+
+After the async loads are done:
+
+* An instance of each view is created and shown in the appropriate `Marionette.Region`.
+
+* We register on the promise of the `fetch` function returned from the collection so that when it has been resolved
+we update the todoList.
+
+```js
+todosCollection = new TodoItemCollection(),
+todoPromise = todosCollection.fetch();
+todoPromise.done(function () {
+    _this.vent.trigger("todosUpdated", { collection: todosCollection });
+});
+```
+
+An important thing to notice is that we don't wait for the collection to finish loading before we show the views.
+We want an empty UI (or some "loading..." screen) to be visible to the user and when the collection is loaded it will fill the elements in the UI.
+
+### Views and Sub-Views
+In the previous section the controller loaded the topmost views (usually only the main 
+`Marionette.Layout` is loaded in this stage). Each view of type 
+`Marionette.Layout`, `Marionette.CompositeView`, and 
+`Marionette.CollectionView` (i.e. the parent view) is responsible for 
+loading all the sub-views (sub-views are the views that are embedded within 
+the parent view) through the `define` statement of the module where the parent view
+is defined. In our example the controller loads the `MainLayoutView` into the main
+region of the page called `section`. `MainLayoutView`, as the name suggests, extends `Marionette.Layout`
+and therefore it loads all the embedded views: `main_header_view`, `main_content_view`, and `main_footer_view`.
+
+Each view of type `Marionette.Layout`, `Marionette.CompositeView`, 
+and `Marionette.ItemView` is responsible
+for loading its template. We will discuss views in details in the next section but for now
+we can see that the template is loaded trough the `define` statement of the parent view
+much like the sub-views.
+
+```js
+    define(['marionette', 'hbs!./templates/main_layout', './main_header_view', './main_content_view', './main_footer_view', './../controller'],
+        function (Marionette, layoutTemplate, MainHeaderView, MainContentView, MainFooterView, controller) {
+```
