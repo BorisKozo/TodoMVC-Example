@@ -310,9 +310,109 @@ on the collection itself.
 
 `todo_item_view` (`Marionette.ItemView`) is a single line in the list of todos. This
 view is instantiated by `main_content_view` when it renders its collection. This view holds
-the `TodoItem` model and handles all the CRUD operations of a single todo item.
+the `TodoItem` model and handles all the [CRUD](http://en.wikipedia.org/wiki/Create,_read,_update_and_delete) operations of a single todo item.
 
-### Testing
+### main_header_view
+As we state above, `main_header_view` is responsible for entering text for a new todo. Note that it is
+not responsible for creating a new todo, this view doesn't even "know" what a todo it. It's job is simple,
+wait for the user to input some text in the text box. If the `return` key is pressed trigger an event that
+the user submitted some text on the EventBus and clear the input. The triggered event is `todoTextReady`.
+
+```js
+       inputKeypress: function(e) {
+         var ENTER_KEY = 13,
+            todoText = this.ui.input.val().trim();
+
+         if (e.which === ENTER_KEY && todoText) {
+            controller.vent.trigger('todoTextReady', todoText);
+            this.ui.input.val('');
+         }
+      }
+``` 
+
+### todo_item_view
+Before we jump into the details of `main_content_view` lets review the inner workings of
+`todo_item_view`. This view is responsible for all the operations done on a single todo
+line. The user can perform one of three operations on this view:
+
+* A click on the 'V' (left side) completes/uncompletes the todo. The click event handler delegates
+to a function called `finishClicked` which sets the `isFinished` model property and triggers the 
+`finishChanged` event on the collection, passing the changed model. We don't make use of the automatically triggered 
+`change:isFinished` event to be able to aggregate all the changed models into one event in the 
+case where more than one model's `isFinished` property has changed.
+
+```js
+        finishClicked: function (e) {
+            var finishState = e.target.checked;
+            this.model.set('isFinished', finishState);
+            this.model.collection.trigger('finishChanged', [this.model], this.model.collection);
+        }
+```
+
+* A click on the 'X' (right side) removes the todo from the list. This is quite straight forward as we call
+the `model.destroy()` function and let Backbone do all the magic.
+
+```js
+        deleteClicked: function () {
+            this.model.destroy();
+        }
+```
+
+* A double-click on the todo text enters the edit mode where the label showing the todo text is
+replaced by a text box which allows you to enter new text (even if this todo is completed). 
+To show the text box we simple change some pre-defined css classes. The interesting part is the handling
+of the `focusout` event on the text box which, essentially, submits the edited text. In the event handler
+we verify that the given text is not empty and decide whether we want to save or delete it. The TodoMVC specifications
+dictate that we delete the todo if the edited text is empty.
+
+```js
+        editFocusout: function () {
+            var todoText = this.ui.input.val().trim();
+            if (todoText) {
+                this.model.set('todoText', todoText);
+                this.$el.removeClass('editing');
+                this.render();
+            } else {
+                this.deleteClicked();
+            }
+        }
+```
+
+Note that after we change the model property `todoText` we re-render the view. 
+Rendering the view triggers the `onRender` function where we manipulate the UI
+to comply with the model properties. This is the correct place to manipulate the UI 
+since the view may be re-rendered from various execution paths (e.g. when the user 
+clicks the toggle all completed button) and it must always be rendered correctly. 
+
+```js
+         onRender: function () {
+            var finishState = this.model.get('isFinished');
+
+            this.$el.removeClass('hidden');
+            this.$el.removeClass('editing');
+
+            if (controller.displayMode === controller.displayModes.active && this.model.get('isFinished')) {
+                this.$el.addClass('hidden');
+            }
+
+            if (controller.displayMode === controller.displayModes.completed && !this.model.get('isFinished')) {
+                this.$el.addClass('hidden');
+            }
+
+            if (finishState) {
+                this.$el.removeClass('active').addClass('completed');
+            } else {
+                this.$el.addClass('active').removeClass('completed');
+            }
+            this.ui.finishedCheckbox.prop('checked', finishState);
+        }
+```
+
+### main_content_view
+
+
+
+# Testing
 Solid Testing suite is a crucial component of building a robust JavaScript application. This is especially
 important due to JavaScript dynamic nature and lack of compiler. There are many alternatives to create and run tests.
 [Mocha](http://visionmedia.github.com/mocha/) and [Jasmine](http://pivotal.github.com/jasmine/) are the two most

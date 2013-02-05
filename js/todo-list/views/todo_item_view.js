@@ -35,7 +35,7 @@ define(['marionette', 'hbs!./templates/todo_item', './../controller'], function 
         },
 
         deleteClicked: function () {
-            this.model.collection.remove(this.model);
+            this.model.destroy();
         },
 
         editClicked: function () {
@@ -48,7 +48,7 @@ define(['marionette', 'hbs!./templates/todo_item', './../controller'], function 
             var todoText = this.ui.input.val().trim();
             if (todoText) {
                 this.model.set('todoText', todoText);
-                this.$el.removeClass('editing');
+     
                 this.render();
             } else {
                 this.deleteClicked();
@@ -74,6 +74,7 @@ define(['marionette', 'hbs!./templates/todo_item', './../controller'], function 
             var finishState = this.model.get('isFinished');
 
             this.$el.removeClass('hidden');
+            this.$el.removeClass('editing');
 
             if (controller.displayMode === controller.displayModes.active && this.model.get('isFinished')) {
                 this.$el.addClass('hidden');
