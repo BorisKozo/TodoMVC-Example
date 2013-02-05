@@ -22,7 +22,7 @@ describe("Todo Application", function() {
 
    beforeEach(function(callback) {
       that.browser = new Browser({
-//         debug: true,
+         //debug: true,
          //proxy: "http://web-proxy.isr.hp.com:8080",
          site: baseUrl,
          waitFor: 4
@@ -92,7 +92,6 @@ describe("Todo Application", function() {
                expect(that.browser.text("#todo-list li.hidden")).to.eql("first item");
                done();
             });
-
          })
       });
    });
