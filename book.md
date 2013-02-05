@@ -297,7 +297,21 @@ the `main_content_view` is responsible for performing all the operations on the 
 appropriate events on the EventBus. We decided to trigger the events from the view and not directly from the 
 collection to allow some decoupling between the collection and the controller. In fact the guideline we used
 is that the collections/models are not dependant on anything (except for inner dependencies required by Marionette).
+The collection part of `main_content_view` contains a list which renders `todo_item_view` for each element in the 
+collection creating the list in the UI.
 
-`main_footer_view` (`Marionette.ItemView`) is responsible for displaying the footer of the list.
+`main_footer_view` (`Marionette.ItemView`) is responsible for displaying the footer of the list. The footer contains information
+regarding the completion state of the todos in the list and allows you to filter the list based on the completion state or remove
+all the completed todos. What is important about this view is that it is strongly coupled (in terms of data) with the todos collection
+which is controlled by the `main_content_view`. Therefore, the updates in this view are done through events on the EventBus. In fact,
+we have only one event, `todosUpdated`, which is sent when the todos collection is updated. The event passes just enough information
+to allow the `main_footer_view` to update all the controls on the UI without allowing the `main_footer_view` perform operations
+on the collection itself.
+
+`todo_item_view` (`Marionette.ItemView`) is a single line in the list of todos. This
+view is instantiated by `main_content_view` when it renders its collection. This view holds
+the `TodoItem` model and handles all the CRUD operations of a single todo item.
+
+
 
 
