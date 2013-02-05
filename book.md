@@ -409,8 +409,82 @@ clicks the toggle all completed button) and it must always be rendered correctly
 ```
 
 ### main_content_view
+`main_content_view` is where all the collection operations happen. The only UI element
+which is controlled by the `main_content_view` is the toggle-all button (on the left of the 
+header text box) which toggles the completion state of all the todos in the list. The most important
+thing to note here is the regular separation between the operation and the UI change. For example, to
+add a new model to the collection we listen to the `todoTextReady` event on the EventBus. When the event
+is triggered we add a new model to the collection with the provided text (we don't make any updates yet). 
+This triggers  the `add` event on the collection. We listen to the `add` collection event and when it is triggered
+we trigger the `todosUpdated` event on the EventBus. We listen to the `todosUpdated` event on the EventBus
+and when that is triggered we update the check state of the toggle-all button according to the TodoMVC specifications.
 
+```js
+            initialize: function () {
+                controller.vent.on('todoTextReady', this.addTodo, this);
+                controller.vent.on('todosUpdated', this.todosUpdated, this);
+            }
 
+            addTodo: function (todoText) {
+                this.collection.push({ todoText: todoText });
+            }
+
+            collectionEvents: {
+                'add': 'todoAdded',
+            }
+
+            todosUpdated: function (data) {
+                var hasUnfinished = data.collection.some(function (item) {
+                    return !item.get('isFinished');
+                });
+
+                this.ui.toggleAll.prop('checked', !hasUnfinished);
+            }
+```
+
+A similar flow happens when a model is removed from the collection or when a collection is
+reset. 
+
+### main_footer_view
+
+The `main_footer_view` performs three main functions:
+
+* Displaying the number of incomplete todos in the todos list. To this end the view
+listens to the `todosUpdated` event on the EventBus. When this event is triggered the 
+event argument is an array of all the models (although this can be optimized to contain
+a separate list of the changed models) from which the view can easily calculate the number
+of incomplete items by reading the `isFinished` property of each model. The view keeps 
+two variables to track the current state: `unfinishedItemsCount` the number of incomplete todos and
+`finishedItemsCount` the number of complete todos. When the view is rendered the template expects
+these two properties to be passed in to the template rendering function. Fortunately for us, Marionette 
+handles this case by allowing the view to override a function called `SerializeData`. The return value
+of this function is passed to the template rendering function allowing us to easily pass the two stored values.
+We could use a specialized model to store the two values for consistency but we felt that we rather not create
+transient models and therefore decided to store the two properties directly on the view.
+
+```js
+        serializeData: function () {
+            return {
+                unfinishedItemsCount: this.unfinishedItemsCount,
+                finishedItemsCount: this.finishedItemsCount,
+                itemString: this.unfinishedItemsCount === 1 ? 'item' : 'items'
+            };
+        },
+
+        updateData: function (data) {
+            var count = 0;
+            data.collection.each(function (todo) {
+                if (!todo.get('isFinished')) {
+                    count += 1;
+                }
+            });
+
+            this.unfinishedItemsCount = count;
+            this.finishedItemsCount = data.collection.length - count;
+
+            this.render();
+        }
+```
 
 # Testing
 

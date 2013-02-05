@@ -36,12 +36,12 @@ define(['backbone', 'marionette', 'underscore', 'hbs!./templates/main_content', 
 
             todoAdded: function (model, collection) {
                 controller.vent.trigger('todosUpdated', { added: [model], collection: collection });
-                Backbone.sync('create', model);
+                model.save();
             },
 
             todoRemoved: function (model, collection) {
                 controller.vent.trigger('todosUpdated', { removed: [model], collection: collection });
-                Backbone.sync('delete', model);
+                model.destroy();
             },
 
             collectionLoaded: function (collection) {

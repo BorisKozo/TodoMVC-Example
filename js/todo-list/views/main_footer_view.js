@@ -8,7 +8,6 @@ define(['marionette', 'underscore', 'hbs!./templates/main_footer', './../control
             //TODO: These should be in the model
             this.unfinishedItemsCount = 0;
             this.finishedItemsCount = 0;
-            this.itemString = 'items';
             controller.vent.on('todosUpdated', this.updateData, this);
             controller.vent.on('displayModeChanged', this.render, this);
         },
@@ -28,7 +27,7 @@ define(['marionette', 'underscore', 'hbs!./templates/main_footer', './../control
             return {
                 unfinishedItemsCount: this.unfinishedItemsCount,
                 finishedItemsCount: this.finishedItemsCount,
-                itemString: this.itemString
+                itemString: this.unfinishedItemsCount === 1 ? 'item' : 'items'
             };
         },
 
@@ -42,12 +41,6 @@ define(['marionette', 'underscore', 'hbs!./templates/main_footer', './../control
 
             this.unfinishedItemsCount = count;
             this.finishedItemsCount = data.collection.length - count;
-
-            if (this.unfinishedItemsCount === 1) {
-                this.itemString = 'item';
-            } else {
-                this.itemString = 'items';
-            }
 
             this.render();
         },
