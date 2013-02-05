@@ -313,10 +313,15 @@ view is instantiated by `main_content_view` when it renders its collection. This
 the `TodoItem` model and handles all the CRUD operations of a single todo item.
 
 ### Testing
-Solid Testing suite is a crucial part of building a robust JavaScript application. This is especially
-important due to JavaScript dynamic nature and lack of compiler. There are many alternatives to create a tests.
+Solid Testing suite is a crucial component of building a robust JavaScript application. This is especially
+important due to JavaScript dynamic nature and lack of compiler. There are many alternatives to create and run tests.
 [Mocha](http://visionmedia.github.com/mocha/) and [Jasmine](http://pivotal.github.com/jasmine/) are the two most
-popular unit tests frameworks. Both use rSpec BDD syntax (`describe` and `it`) Mocha runs over node.js, 
-therefore it is very easy to install and update. 
+popular unit tests frameworks. Both are quite similar in functionality and use rSpec BDD syntax (`describe` and `it`) with a large and active community. We have implemented our tests suite using Mocha; it runs over node.js, therefore very easy to install and update using node.js' `npm` package manager. 
+
+It is common to devide tests into two layers: unit tests and functional tests. Unit test tests specific part of the code in isolation (e.g. non-trivial function). Functional test tests the functional behavior of the application, usually from the prespective of the end-user. In this sample application we have only implemented the functional tests.
+
+The tests are running in the [Zombie.js](http://zombie.labnotes.org/) browser which is a headless browser. It means that it doesn't have a GUI and it is only useful for testing. The advantages are that the tests execute fast and can run in environment that doesn't have GUI.(such as CI server). The disadvantages are that it might be harder to debug the tests, and that it ignores cross-browser testing. 
+
+
 
 
