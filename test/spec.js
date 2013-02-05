@@ -3,7 +3,7 @@ process.env.NODE_ENV = 'test';
 var Browser = require('zombie');
 var expect = require('chai').expect;
 var baseUrl = "localhost:1234";
-var secondaryUrl = '/index.html#';
+var url = '/index.html';
 
 describe("Todo Application", function() {
    var that = this;
@@ -22,16 +22,26 @@ describe("Todo Application", function() {
 
    beforeEach(function(callback) {
       that.browser = new Browser({
-         //debug: true,
+//         debug: true,
          //proxy: "http://web-proxy.isr.hp.com:8080",
          site: baseUrl,
          waitFor: 4
       });
-      that.browser.visit(secondaryUrl, null, function() {
-         waitForPageLoadEnd(callback);
+      that.browser.visit(url, function(err, browser) {
+         if (err) {
+            callback(err);
+         } else {
+            waitForPageLoadEnd(callback);
+         }
       });
    });
 
+   it("allows to add a new todo item", function(done) {
+      addItem("first item", function() {
+         expect(that.browser.text("li.active")).to.eql("first item");
+         done();
+      })
+   });
 
    it('shows how many items left', function() {
       expect(that.browser.text("#todo-count strong")).to.equal("0");
@@ -43,33 +53,19 @@ describe("Todo Application", function() {
       });
    });
 
-
-//   it("saves the state after page refresh", function(done) {
-//      addItem("first item", function() {
-//         expect(that.browser.text("#todo-count strong")).to.equal("1");
-//      });
-//      that.browser.reload(function() {
-//         waitForPageLoadEnd(function() {
-//         console.log(that.browser.html());
-////            expect(that.browser.text("#todo-count strong")).to.equal("1");
-//            done();
-//         })
-//      })
-//   });
-
-   it("can mark an item as completed", function(done){
+   it("can mark an item as completed", function(done) {
       expect(that.browser.querySelector(".completed")).not.to.exist;
-      addItem("first item",function(){
+      addItem("first item", function() {
          that.browser.check(".toggle");
          expect(that.browser.querySelector(".completed")).to.exist;
          done();
       })
    });
 
-   it("allows marking all items as completed using the toggle all button", function(done){
+   it("allows marking all items as completed using the toggle all button", function(done) {
       expect(that.browser.querySelector(".completed")).not.to.exist;
-      addItem("first item",function(){
-         addItem("second item",function(){
+      addItem("first item", function() {
+         addItem("second item", function() {
             that.browser.check("#toggle-all");
             expect(that.browser.querySelectorAll(".completed").length).to.eql(2);
             done();
@@ -77,47 +73,61 @@ describe("Todo Application", function() {
       });
    });
 
-   it("doesn't allow to add en empty item",function(done){
+   it("doesn't allow to add an empty item", function(done) {
       expect(that.browser.querySelectorAll("li.active").length).to.eql(0);
-      addItem("",function(){
+      addItem("", function() {
          expect(that.browser.querySelectorAll("li.active").length).to.eql(0); //after adding empty item, no new item was created
          done();
       });
    });
 
-   xit("allows to filter only active items", function(){
+   it("allows to filter and show only active items", function(done) {
+      addItem("first item", function() {
+         that.browser.check(".toggle");
+         addItem("second item", function() {
+            that.browser.clickLink(".filter-active");
+            that.browser.wait(function() {
+               return that.browser.querySelector("a.filter-active.selected")
+            }, function() {
+               expect(that.browser.text("#todo-list li.hidden")).to.eql("first item");
+               done();
+            });
 
+         })
+      });
    });
 
-   /*xit('shows "clear completed" button when there are completed items in the list', function(done) {
+   it("allows to filter only completed items", function(done) {
+      addItem("first item", function() {
+         that.browser.check(".toggle");
+         addItem("second item", function() {
+            that.browser.clickLink(".filter-completed");
+            that.browser.wait(function() {
+               return that.browser.querySelector("a.filter-completed.selected")
+            }, function() {
+               expect(that.browser.text("#todo-list li.hidden")).to.eql("second item");
+               done();
+            });
 
-    });*/
+         })
+      });
+   });
 
-//   it("allows to add a new todo item", function() {
-//
-//
-//      assert(browser.querySelector("#header"))
-//      console.log("myheader it", browser.querySelector("#header"));
-//   });
-   /*
+   it("allows deleting an item", function(done) {
+      addItem("first item", function() {
+         that.browser.pressButton(".destroy", function() {
+            //console.log(that.browser.querySelectorAll("li"));
+            expect(that.browser.querySelectorAll("li.active, li.complete, .destroy").length).to.eql(0);
+            done();
+         });
+      });
+   });
 
-    it("allows deleting an item");
-    it("allows editing an item using mouse double click");
-
-    it("shows how many items are left to be done");
-    it('has a "todo" header');
-    it("shows all items by default");
-    it("allows to filter only active items");
-    it("allows to filter only completed items");
-    it("doesn't allow to add en empty item");
-    it("adds trims items before adding");
-    */
-   /*
-    it('does not show "clear completed" button where there are no completed items in the list');
-    it("shows the destroy icon only when hovering over an item");
-    */
-
-
+   it("shows a header and placeholder text when no item exists", function(done) {
+      expect(that.browser.text("#header")).to.eql("todos");
+      expect(that.browser.html("#new-todo")).to.have.string("What needs to be done?");
+      done();
+   });
 })
 ;
 
