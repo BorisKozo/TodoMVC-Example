@@ -43,7 +43,7 @@ describe("Todo Application", function() {
       })
    });
 
-   it('shows how many items left', function() {
+   it('shows how many items left to be done', function() {
       expect(that.browser.text("#todo-count strong")).to.equal("0");
       addItem("first item", function() {
          expect(that.browser.text("#todo-count strong")).to.equal("1");
