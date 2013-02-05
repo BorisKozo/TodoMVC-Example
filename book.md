@@ -1,4 +1,4 @@
-﻿How we built TodoMVC - Example
+How we built TodoMVC - Example
 ==============================
 
 # Prologue
@@ -415,12 +415,37 @@ clicks the toggle all completed button) and it must always be rendered correctly
 # Testing
 Solid Testing suite is a crucial component of building a robust JavaScript application. This is especially
 important due to JavaScript dynamic nature and lack of compiler. There are many alternatives to create and run tests.
-[Mocha](http://visionmedia.github.com/mocha/) and [Jasmine](http://pivotal.github.com/jasmine/) are the two most
+[Mocha](http://visionmedia.github.com/mocha/) and [Jasmine]a(http://pivotal.github.com/jasmine/) are the two most
 popular unit tests frameworks. Both are quite similar in functionality and use rSpec BDD syntax (`describe` and `it`) with a large and active community. We have implemented our tests suite using Mocha; it runs over node.js, therefore very easy to install and update using node.js' `npm` package manager. 
 
-It is common to devide tests into two layers: unit tests and functional tests. Unit test tests specific part of the code in isolation (e.g. non-trivial function). Functional test tests the functional behavior of the application, usually from the prespective of the end-user. In this sample application we have only implemented the functional tests.
+It is a common practice to devide that basic tests into two layers: unit tests and functional tests. Unit test tests specific part of the code in isolation (e.g. non-trivial function). Functional test tests the functional behavior of the application, usually from the prespective of the end-user. In this sample application we have only implemented the functional tests.
 
-The tests are running in the [Zombie.js](http://zombie.labnotes.org/) browser which is a headless browser. It means that it doesn't have a GUI and it is only useful for testing. The advantages are that the tests execute fast and can run in environment that doesn't have GUI.(such as CI server). The disadvantages are that it might be harder to debug the tests, and that it ignores cross-browser testing. 
+The tests are running in the [Zombie.js](http://zombie.labnotes.org/) browser which is a headless browser. It means that it doesn't have a GUI and it is only useful for testing. The advantages are that the tests execute fast and can run in environment that doesn't have GUI.(such as CI server). The disadvantages are that it might be harder to debug the tests, and that it does not support cross-browser testing. It is important to note that currently, Zombie.js is currently [not supported](http://stackoverflow.com/questions/9851977/how-to-install-zombie-js-on-windows-7-node-js-headless-browser) in Windows.
+
+To start using Mocha, you'll need to have [Node.js](http://nodejs.org) installed. Then install the required node.js packages: `node install mocha zombie chai`. `chai` is a BDD assertion library for node and it allows you to easily declare the conditions you expect (verification points). If one of those expectations fails, the mocha test will fail.
+
+In BDD style, you select some module as the test target. Then, you describe this module's functionality using common language. For example, our Todo application should have the following properties:
+* it allows to add a new todo item
+* it shows how many items left to be done
+* can mark an item as completed
+
+In Mocha we can easily create the basic test skeleton by creating a file and placing it within a folder called `test`. Mocha will search for test files in this directory. To make sure that Mocha visits all the folders add a file called mocha.opts and place it in the tests directory. The content of the file should be:
+```js
+		--reporter spec
+		--recursive
+```
+
+
+```js
+		describe("Todo application", function(){
+			it("allows to add a new todo item");
+			it("shows how many items left to be done")
+			it("can mark an item as completed")
+		})
+```
+You can now run the tests 
+
+
 
 
 
