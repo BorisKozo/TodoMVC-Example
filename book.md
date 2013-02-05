@@ -413,6 +413,8 @@ clicks the toggle all completed button) and it must always be rendered correctly
 
 
 # Testing
+
+### Setting the environment
 Solid Testing suite is a crucial component of building a robust JavaScript application. This is especially
 important due to JavaScript dynamic nature and lack of compiler. There are many alternatives to create and run tests.
 [Mocha](http://visionmedia.github.com/mocha/) and [Jasmine]a(http://pivotal.github.com/jasmine/) are the two most
@@ -423,18 +425,18 @@ It is a common practice to devide that basic tests into two layers: unit tests a
 The tests are running in the [Zombie.js](http://zombie.labnotes.org/) browser which is a headless browser. It means that it doesn't have a GUI and it is only useful for testing. The advantages are that the tests execute fast and can run in environment that doesn't have GUI.(such as CI server). The disadvantages are that it might be harder to debug the tests, and that it does not support cross-browser testing. It is important to note that currently, Zombie.js is currently [not supported](http://stackoverflow.com/questions/9851977/how-to-install-zombie-js-on-windows-7-node-js-headless-browser) in Windows.
 
 To start using Mocha, you'll need to have [Node.js](http://nodejs.org) installed. Then install the required node.js packages: `node install mocha zombie chai`. `chai` is a BDD assertion library for node and it allows you to easily declare the conditions you expect (verification points). If one of those expectations fails, the mocha test will fail.
-
-In BDD style, you select some module as the test target. Then, you describe this module's functionality using common language. For example, our Todo application should have the following properties:
-* it allows to add a new todo item
-* it shows how many items left to be done
-* can mark an item as completed
-
-In Mocha we can easily create the basic test skeleton by creating a file and placing it within a folder called `test`. Mocha will search for test files in this directory. To make sure that Mocha visits all the folders add a file called mocha.opts and place it in the tests directory. The content of the file should be:
+Add a file called mocha.opts and place it in the tests directory. The flag `--reporter spec` in the file sets the reporter to output the current test that runs. The flag `--recursive` tells Mocha to do a recursive search for `test` folders and execute the code in that directory. The content of the file should be:
 ```js
 		--reporter spec
 		--recursive
 ```
+### Writing the tests
+The tests are implemented in the file `TodoMVC-Example/test/functional.js`. In BDD style, you select some module as the test target. Then, you describe this module's functionality using common language. For example, let's describe our Todo application. It is clear that the application should have the following properties:
+* it allows to add a new todo item
+* it shows how many items left to be done
+* can mark an item as completed
 
+In the `test` directory we can add the following skeleton.
 
 ```js
 		describe("Todo application", function(){
@@ -443,7 +445,11 @@ In Mocha we can easily create the basic test skeleton by creating a file and pla
 			it("can mark an item as completed")
 		})
 ```
-You can now run the tests 
+You can now run the tests by using `mocha` in the console. All the tests will be presented as "pending" since we did not provide an implementation. The implementation is done by manipulating the Zombie.js browser.
+Mocha provides a beforeEach() function which is being executed before each test. In this method we create a new browser instance; we do not reuse the browser to prevent interactions between different tests. We then use the `visit` method. A very important pitfall in JavaScript testing is the wait issue. In traditional web page, the page DOM is constructed from the Html file. If we use $(window).ready() function, all our DOM is gurenteed to be ready. However, in a single page JavaScript application, the Dom is built dynamically. This pose a difficulty for testing tools as they cannot know when the page was fully loaded. For example, consider our todo application. When the application page is first loaded is doesn't contain the UI elements. Only then, RequireJS dynamically loads the text box which allows adding new items. If we consider our first test (adding new todo item), this test will probably fail, since the text box in which the user enters the new item doesn't exist immediatly after the page was loaded. 
+To handle this case we have to explicitly wait for some condition and only then can we 
+
+EOF
 
 
 
