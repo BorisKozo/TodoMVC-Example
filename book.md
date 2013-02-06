@@ -548,7 +548,7 @@ based on the current display mode.
                 this.$el.addClass('hidden');
             }
 ```
-
+										 
 Note how every view retains its responsibility and handles its own assets based on events on the EventBus. 
 
 
