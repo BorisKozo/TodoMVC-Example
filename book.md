@@ -520,8 +520,15 @@ In the `test` directory we can add the following skeleton.
 		})
 ```
 You can now run the tests by using `mocha` in the console. All the tests will be presented as "pending" since we did not provide an implementation. The implementation is done by manipulating the Zombie.js browser.
-Mocha provides a beforeEach() function which is being executed before each test. In this method we create a new browser instance; we do not reuse the browser to prevent interactions between different tests. We then use the `visit` method. A very important pitfall in JavaScript testing is the wait issue. In traditional web page, the page DOM is constructed from the Html file. If we use $(window).ready() function, all our DOM is gurenteed to be ready. However, in a single page JavaScript application, the Dom is built dynamically. This pose a difficulty for testing tools as they cannot know when the page was fully loaded. For example, consider our todo application. When the application page is first loaded is doesn't contain the UI elements. Only then, RequireJS dynamically loads the text box which allows adding new items. If we consider our first test (adding new todo item), this test will probably fail, since the text box in which the user enters the new item doesn't exist immediatly after the page was loaded. 
-To handle this case we have to explicitly wait for some condition and only then can we 
+Mocha provides a beforeEach() function which is being executed before each test. In this method we create a new browser instance; we do not reuse the browser to prevent interactions between different tests. We then use the `visit` method. A very important pitfall in JavaScript testing is the wait issue. In traditional web page, the page DOM is constructed from the Html file. If we use $(window).ready() function, all our DOM is gurenteed to be ready. However, in a single page JavaScript application, the Dom is built dynamically. This pose a difficulty for testing tools as they cannot know when the page was fully loaded. For example, consider our todo application. When the application page is first loaded is doesn't contain the UI elements. Only then, RequireJS dynamically loads the text box which allows adding new items. If we consider our first test (adding new todo item); this test will probably fail, since the text box in which the user enters the new item doesn't exist immediatly after the page was loaded. 
+To handle this case we have to explicitly wait for some condition. In the tests, we check that an item with id `#new-todo` exists. We use it as indication that the JavaScript code executed and created the relevant DOM elements. 
+```js
+		function waitForPageLoadEnd(callback) {
+			that.browser.wait(function() {
+				return that.browser.querySelector("#new-todo");
+			}, callback);
+		}
+```
 
 EOF
 
