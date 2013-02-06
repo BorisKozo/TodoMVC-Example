@@ -597,6 +597,27 @@ case hiding the "Clear completed" button.
 
 ### Integrating with Backbone.localStorage
 
+The specifications of TodoMVC require us to retain the todos between browser
+refreshes. This means that we must store the todos somewhere. Fortunately Backbone
+architecture allows extensions and mixins. We use the Backbone.localStorage extension
+to store the todos in the browser local storage. First we add the definition for Backbone.localStorage
+to the `shims` and the `paths` properties in `main.js`. Once we do that, the plugin
+overrides a key function in Backbone called `Backbone.sync`. This function is responsible
+for the saving and loading of Backbone models. The new `Backbone.sync` function checks
+if the model (or collection) has a property called `localStorage`. If this property doesn't exist then
+it the original `Backbone.sync` function is called. If this property exists then the implementation
+of the plugin is called. The implementation of the plugin saves and loads each model to and from
+the local storage of the browser. Adding the plugin and setting the property makes our entire implementation
+work with the local storage without additional effort.
+
+```js
+    var TodoItemCollection = Backbone.Collection.extend({
+        model: TodoItem,
+        localStorage: new Backbone.LocalStorage("TodoItemCollection")
+```
+
+We pass a key name to the `Backbone.LocalStorage` constructor function. It uses that
+key to store our data in a partition of the local storage with that name.
 
 
 # Optimizing with r.js
