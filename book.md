@@ -563,7 +563,28 @@ case hiding the "Clear completed" button.
 
 # Optimizing with r.js
 
+RequireJS provides an optimization tool called `r.js` which optimizes the code for 
+production use. We give a small taste of the tool's capabilities by compiling all of
+the application code into one file called `main-built.js`. `r.js` is capable of doing
+various operation to optimize your code, see [full documentation here](http://requirejs.org/docs/optimization.html).
+To use `r.js` you need to install it using [Node.js](http://nodejs.org/) package manager (a.k.a. `npm`). Make sure
+you have Node.js installed on your system, open a command line window in the project directory and write `npm install`.
+After the installation is over you should have a directory called `node_modules` in the project directory. Do not
+commit or change files from that directory in your repository. To run `r.js` you need 
+a configuration file that sets all the relevant options. We provide such a file for our
+project called `app.build.js`. The configuration file resembles the `main.js` file of our 
+project but has some optimization related properties defined. Please refer to the `r.js` documentation for
+full information on all the properties or use [this annotated source](https://github.com/jrburke/r.js/blob/master/build/example.build.js). 
 
+To build `main-built.js` run the following command from the project directory:
+````
+node node_modules\requirejs\bin\r.js -o app.build.js
+````
+
+The optimizer finds all the dependencies and the loading order and creates a single `js` file
+that contains a concatenated version of all the `js` files that would load on your page. You can 
+browse to `index2.html` to see that the resulting page behaves the same as the original page
+but with a significant performance boost on high latency connections.
 
 # Testing
 
