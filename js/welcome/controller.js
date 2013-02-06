@@ -12,7 +12,13 @@ define(['require', 'jquery', 'backbone', 'marionette', 'underscore', 'js/app'],
             });
          },
 
-         start: function() {}
+         start: function() {
+             var result = $.Deferred();
+             require(['./views/welcome_view', './router'], function() {
+                 result.resolve();
+             });
+             return result.promise();
+         }
       });
 
       return new Controller();

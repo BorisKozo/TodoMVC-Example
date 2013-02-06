@@ -57,6 +57,10 @@ body {
 	height: 100%;
 }
 
+#todo-list.links-list {
+
+}
+
 #todoapp input::-webkit-input-placeholder {
 	font-style: italic;
 }

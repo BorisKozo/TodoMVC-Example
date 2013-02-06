@@ -3,7 +3,8 @@
 define(['marionette', 'hbs!./templates/main_layout', './main_header_view', './main_content_view', './main_footer_view', './../controller'],
     function (Marionette, layoutTemplate, MainHeaderView, MainContentView, MainFooterView, controller) {
         'use strict';
-        var SlideAnimationDuration = 0, MainLayoutView = Marionette.Layout.extend({
+        var SlideAnimationDuration = 0,
+           MainLayoutView = Marionette.Layout.extend({
             template: layoutTemplate,
             regions: {
                 header: '#header',

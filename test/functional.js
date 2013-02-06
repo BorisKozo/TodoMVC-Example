@@ -3,7 +3,7 @@ process.env.NODE_ENV = 'test';
 var Browser = require('zombie');
 var expect = require('chai').expect;
 var baseUrl = "localhost:1234";
-var url = '/index.html';
+var url = '/index.html#/all';
 
 describe("Todo Application", function() {
    var that = this;

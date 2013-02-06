@@ -6,19 +6,16 @@ define(['require', 'jquery', 'backbone', 'marionette', 'underscore', 'js/app', '
 
        var initialize = function() {
               var _this = controller,
-                 result = $.Deferred(),
                  todosCollection = new TodoItemCollection(),
                  todoPromise = todosCollection.fetch();
 
-              require(['./views/main_layout_view', './views/footer_view', './router'], function(MainLayoutView, FooterView) {
-                  App.section.show(new MainLayoutView({ todosCollection: todosCollection }));
-                  App.footer.show(new FooterView());
-                  todoPromise.done(function() {
-                      _this.vent.trigger("todosUpdated", { collection: todosCollection });
-                  });
-                  result.resolve();
+              var MainLayoutView = require('./views/main_layout_view'),
+                 FooterView = require('./../common/views/footer_view');
+              App.section.show(new MainLayoutView({ todosCollection: todosCollection }));
+              App.footer.show(new FooterView());
+              todoPromise.done(function() {
+                  _this.vent.trigger("todosUpdated", { collection: todosCollection });
               });
-              return result.promise();
           },
 
           Controller = Marionette.Controller.extend({
@@ -31,32 +28,26 @@ define(['require', 'jquery', 'backbone', 'marionette', 'underscore', 'js/app', '
               },
 
               displayModeAll: function() {
-                  var that = this;
-                  initialize().done(function() {
-                      that.displayMode = that.displayModes.all;
-                      that.vent.trigger('displayModeChanged', that.displayMode);
-                  });
+                  initialize();
+                  this.displayMode = this.displayModes.all;
+                  this.vent.trigger('displayModeChanged', this.displayMode);
               },
 
               displayModeActive: function() {
-                  var that = this;
-                  initialize().done(function() {
-                      that.displayMode = that.displayModes.active;
-                      that.vent.trigger('displayModeChanged', that.displayMode);
-                  });
+                  initialize();
+                  this.displayMode = this.displayModes.active;
+                  this.vent.trigger('displayModeChanged', this.displayMode);
               },
 
               displayModeCompleted: function() {
-                  var that = this;
-                  initialize().done(function() {
-                      that.displayMode = that.displayModes.completed;
-                      that.vent.trigger('displayModeChanged', that.displayMode);
-                  });
+                  initialize();
+                  this.displayMode = this.displayModes.completed;
+                  this.vent.trigger('displayModeChanged', this.displayMode);
               },
 
               start: function() {
                   var result = $.Deferred();
-                  require(['./views/main_layout_view', './views/footer_view', './router'], function() {
+                  require(['./views/main_layout_view', './../common/views/footer_view', './router'], function() {
                       result.resolve();
                   });
                   return result.promise();

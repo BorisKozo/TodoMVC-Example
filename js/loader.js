@@ -11,7 +11,7 @@ define(['require', 'jquery', 'underscore', './app',
                 _(controllers).each(function(controllerName) {
                     promises.push(require(controllerName).start());
                 });
-                $.when(promises).then(function () {
+                $.when.apply(this, promises).then(function () { //the apply is a trick to convert the array to comma separated list required by when
                     App.start();
                 });
             }
