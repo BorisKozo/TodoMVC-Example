@@ -10,7 +10,7 @@ define(['require', 'jquery', 'backbone', 'marionette', 'underscore', 'js/app'],
                var WelcomeView = require('./views/welcome');
                var FooterView = require('../common/views/footer_view');
                App.section.show(new WelcomeView());
-               App.footer.show(new FooterView());
+               App.footer.show(new FooterView({hint: "Please click one of the links above"}));
            },
 
            start: function() {

@@ -60,6 +60,11 @@ body {
 #todoapp.links-list {
     margin-bottom: 0px;
     margin-top: 0px;
+
+}
+
+label.clickable {
+    cursor: pointer;
 }
 
 #todoapp input::-webkit-input-placeholder {

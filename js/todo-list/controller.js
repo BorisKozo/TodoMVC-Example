@@ -12,7 +12,7 @@ define(['require', 'jquery', 'backbone', 'marionette', 'underscore', 'js/app', '
               var MainLayoutView = require('./views/main_layout_view'),
                  FooterView = require('./../common/views/footer_view');
               App.section.show(new MainLayoutView({ todosCollection: todosCollection }));
-              App.footer.show(new FooterView());
+              App.footer.show(new FooterView({hint: "Double-click to edit a todo"}));
               todoPromise.done(function() {
                   _this.vent.trigger("todosUpdated", { collection: todosCollection });
               });
