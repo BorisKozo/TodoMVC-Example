@@ -57,8 +57,9 @@ body {
 	height: 100%;
 }
 
-#todo-list.links-list {
-
+#todoapp.links-list {
+    margin-bottom: 0px;
+    margin-top: 0px;
 }
 
 #todoapp input::-webkit-input-placeholder {
