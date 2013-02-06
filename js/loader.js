@@ -11,7 +11,7 @@ define(['require', 'jquery', 'underscore', './app',
                 _(controllers).each(function(controllerName) {
                     promises.push(require(controllerName).start());
                 });
-                $.when.apply(this, promises).then(function () { //the apply is a trick to convert the array to comma separated list required by when
+                $.when.apply(this, promises).then(function () { //we call apply because "when" expects all the promises to be passed as separate arguments and not as an array
                     App.start();
                 });
             }

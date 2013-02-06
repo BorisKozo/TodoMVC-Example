@@ -2,20 +2,29 @@ How we built TodoMVC - Example
 ==============================
 
 # Prologue
-[TodoMVC](http://addyosmani.github.com/todomvc/) is an internet project which offers
-several implementations to a well defined application using various popular 
-JavaScript MV* frameworks. We have implemented TodoMVC using [Backbone](http://backbonejs.org/) and [Marionette](http://marionettejs.com/) 
-as our MV* frameworks, [Handlebars](http://handlebarsjs.com/) as our templating engine, and 
-[RequireJS](http://requirejs.org/) as our AMD framework. Before continuing, you should get familiarized with the basic
-concepts of the aforementioned frameworks and the flow of the TodoMVC application. In this text we present
-and explain the various decisions we took while developing the TodoMVC application. Please feel free to leave your comments
-and text edits in the [issues](https://github.com/BorisKozo/TodoMVC-Example/issues) section.
+
+[TodoMVC](http://addyosmani.github.com/todomvc/) is a project which offers a wide verity of
+ implementations to a well defined application (called TodoMVC) using popular 
+JavaScript MV* frameworks. We have implemented TodoMVC using
+[Backbone](http://backbonejs.org/) 
+and [Marionette](http://marionettejs.com/) as our core MV* frameworks, 
+[Handlebars](http://handlebarsjs.com/) as our templating engine, and 
+[RequireJS](http://requirejs.org/) as our AMD framework. Before continuing, you 
+should get familiarized with the basic concepts of the aforementioned frameworks 
+and the flow of the TodoMVC application. In this chapter we present
+and explain the various decisions we took while developing this flavor of TodoMVC application. 
+Please feel free to leave your comments and contributions in the 
+[issues](https://github.com/BorisKozo/TodoMVC-Example/issues) section. Note that for
+the sake of this example we added a welcome screen which is not part of the specification.
+The welcome screen takes you to our implementation of TodoMVC which is aligned with the 
+spec.
 
 # Code Structure
-Before we decided on the structure of the application we thought of the build and deployment process.
-We had several possible options:
 
-* Put all the code in a big JavaScript file (or concatenate several files into one file).
+Before deciding on the structure of the application we must think of the build and deployment process.
+We consider several possibilities:
+
+* Put all the code in a big (actually HUGE) JavaScript file (or concatenate several files into one file).
 
 * Use Marionette built in modules.
 
@@ -23,25 +32,32 @@ We had several possible options:
 
 * Use AMD style modules.
 
-Clearly the first option is not a good idea for even a small size application, even when concatenating
-several files into one big JavaScript file in order to enable easier development. There are various issues with this process 
-starting from awkward debugging (where you debug a 7K lines file that keeps changing) and ending with dependencies on the order 
-of the concatenation which are not always easy to overcome. The main benefit of this method is that it creates a single file
-which is faster to download than lots of small files. Marionette modules are a good solution but they do not offer a full solution
-for a larger scale application. Although in the case of TodoMVC Marionette modules are more than enough, we wanted to simulate building a large
-scale application. The choice between CommonJS and AMD is harder because both concepts are somewhat similar and would fit our needs (For example Node.js
-uses CommonJS style modules). We eventually decided to go with AMD style modules due to the following reasons:
+Clearly the first option is not a good idea for even a small sized application, 
+even when concatenating several separate files into one big JavaScript file 
+in order to enable easier development. There are various issues with this process 
+starting from awkward debugging (where you debug a >7K lines file that keeps changing
+under your feet) and ending with dependencies on the order of the concatenation 
+which are not always easy to overcome. The main benefit of this method is that it
+creates a single file which is faster to download than many small files, especially on
+high latency connections. Marionette modules are a good solution but they do not 
+offer a full solution for a larger scale application. Although in the case of 
+TodoMVC Marionette modules are more than enough, we want to simulate building 
+a large scale application. The choice between CommonJS and AMD is harder because 
+both concepts are somewhat similar and would fit our needs (For example Node.js
+uses CommonJS style modules). Our decision is to go with AMD style modules due 
+to the following reasons:
 
-* There is a complete solution for AMD style modules in the form of RequireJS.
+* There is a complete solution for AMD style modules in the form of the RequireJS framework.
 
 * There is a full support of AMD modules by Marionette.
 
 * There is a plug-in that supports handlebars templates for RequireJS.
 
-* There is an optimizer which comes with RequireJS that allows compilation of a single JavaScript file for production mode.
+* There is an optimizer which comes with RequireJS that allows compilation of all the
+code into a single JavaScript file for production mode.
 
-Selecting AMD style modules using RequireJS as our modules system allowed us to use a simple directory structure
-which is aligned with the TodoMVC specifications. 
+Choosing AMD style modules using RequireJS as our modules system allows us to use a 
+simple directory structure which is aligned with the TodoMVC specifications. 
 
 ### Directory Structure
 
@@ -50,6 +66,12 @@ The basic directory structure for our application is:
 |
 |- lib
 |- js
+|  |- common
+|  |- welcome
+|  |  |-views
+|  |  |  |- templates
+|  |  |- controller.js
+|  |  |- router.js
 |  |- todo-list
 |  |  |-views
 |  |  |  |- templates
@@ -62,37 +84,48 @@ The basic directory structure for our application is:
 |- assets
 |- index.html
 ````
-(Note that only the main files are displayed).
+(For brevity we omit some of the internal files).
 
-In the root folder we currently have only one file which is `index.html`. Since we are using 
-RequireJS, the content of the `index.html` file is quite simple. We have the stylesheet and the base script of TodoMVC, 
-and some basic layouting of our application (a section and a footer). The most important element is the last
-script tag 
+In the root folder we have only one file which is `index.html`. Since we are using 
+RequireJS, the content of the `index.html` file is quite simple. In it we have the 
+stylesheet and the base script of TodoMVC (downloaded from the TodoMVC project page)
+, and some basic layouting of our application (a section and a footer). 
+The most important element is the last script tag 
 
     <script data-main="js/main" src="lib/require.js"></script>
 
-It tells RequireJS to load a file named `main.js` from the `js` directory using the RequireJS script from the lib directory.
-More on `main.js` in the next section.
+It tells RequireJS to load a file named `main.js` from the `js` directory using 
+the RequireJS script file `require.js` which exists in the lib directory.
+More details on the structure of `main.js` in the next section.
 
-The lib directory contains all the third party libraries we are using. At this point we added
-Backbone, [Underscore](http://underscorejs.org), and [jQuery](http://jquery.com/) which are dependencies of Backbone,
-RequireJS and Marionette.
+The lib directory contains all the third party libraries we are using. At this point we described
+Backbone, [Underscore](http://underscorejs.org) and [jQuery](http://jquery.com/) which are dependencies of Backbone,
+RequireJS, and Marionette.
 
-The `js` directory contains all the mini-apps (sometimes called module-apps) directories and all the JavaScript 
-which is common in all the mini-apps. For example, todo-list is a mini-app and it contains folders for the two main
-Backbone constructs: models and views (we regard Backbone collections as models but it is possible to create a separate directory).
-We discuss the folder structure of a single mini-app in detail in one of the next sections.
+The `js` directory contains all the mini-apps (sometimes called module-apps) 
+directories and all the JavaScript which is common in all the mini-apps in 
+the common directory. For example, todo-list is a mini-app and it contains 
+folders for the two main Backbone constructs: models and views 
+(we regard Backbone collections as models but it is possible to create a 
+separate directory for the collection files). We discuss the folder structure 
+of a single mini-app in detail in one of the next sections.
 
-The `assets` directory is a requirement of the TodoMVC specification and is not important for this discussion. It contains
-the resources needed by the specification to support the common look and feel of the TodoMVC application.
+The `assets` directory is a requirement of the TodoMVC specification and is 
+not important for this discussion. It contains the resources needed by the 
+specification to support the common look and feel of the TodoMVC application.
 
 ### main.js
-As we mentioned above, `main.js` is the first file that is loaded by the browser when our application starts.
-This file contains the configuration for RequireJS in a `requirejs.config({})` call.
-The first thing we define is the `baseUrl` , the `shims`, and the `paths` of the application. The `baseUrl` determines
-the base path in all the non-relative paths used to require modules. The `shims` define the order of loading for all the non-AMD modules we are loading.
-In our application we load jQuery, Underscore, Backbone, and Marionette from the lib directory. RequireJS makes sure that all the shims are loaded in
-the old fashioned script tag style in your final HTML page and that all the files are in the correct order (based on the dependencies in the code).  
+
+As we mention above, `main.js` is the first file that is loaded by the browser 
+when our application starts. This file contains the configuration for RequireJS 
+in a `requirejs.config({})` call. The first things we define are the `baseUrl` , 
+the `shims`, and the `paths` of the libs our application is using. 
+The `baseUrl` property determines the base path for all the non-relative paths used 
+to require modules. The `shims` property defines the order of loading for all 
+the non-AMD modules we are loading. In our application we load jQuery, Underscore, 
+Backbone, and Marionette from the lib directory. RequireJS makes sure that all the 
+shims are loaded in the old fashioned script tag style in your final HTML page and 
+that those script tags appear in a correct order (based on the dependencies in the code).  
 
 After the call to `requirejs.config()` we delegate our call to the `loader`. This step is not mandatory but we wanted to keep `main.js` clean of any logic.
 The call to the loader simply calls `loader.start()`:
@@ -103,6 +136,7 @@ The call to the loader simply calls `loader.start()`:
 ```
 
 ### The loading process and loader.js
+
 Before we look at the code of `loader.js` we describe the outline of the loading process. RequireJS needs to 
 figure out the loading order of the various modules. Clearly the Marionette Application must be loaded first and it must not 
 depend on any other module. This allows us to pass the App object to any other module that uses the `addInitializer` functionality before the loader starts the Application. 
@@ -561,6 +595,10 @@ all the todos from the todos collection. Since the collection has changed, `main
 on the EventBus. The `main_footer_view` listens to the `todosUpdated` event and retenders itself according to the todos collection state, in this
 case hiding the "Clear completed" button.
 
+### Integrating with Backbone.localStorage
+
+
+
 # Optimizing with r.js
 
 RequireJS provides an optimization tool called `r.js` which optimizes the code for 
@@ -589,6 +627,7 @@ but with a significant performance boost on high latency connections.
 # Testing
 
 ### Setting the environment
+
 Solid Testing suite is a crucial component of building a robust JavaScript application. This is especially
 important due to JavaScript dynamic nature and lack of compiler. There are many alternatives to create and run tests.
 [Mocha](http://visionmedia.github.com/mocha/) and [Jasmine]a(http://pivotal.github.com/jasmine/) are the two most
@@ -598,19 +637,50 @@ It is a common practice to devide that basic tests into two layers: unit tests a
 
 The tests are running in the [Zombie.js](http://zombie.labnotes.org/) browser which is a headless browser. It means that it doesn't have a GUI and it is only useful for testing. The advantages are that the tests execute fast and can run in environment that doesn't have GUI.(such as CI server). The disadvantages are that it might be harder to debug the tests, and that it does not support cross-browser testing. It is important to note that currently, Zombie.js is currently [not supported](http://stackoverflow.com/questions/9851977/how-to-install-zombie-js-on-windows-7-node-js-headless-browser) in Windows.
 
-To start using Mocha, you'll need to have [Node.js](http://nodejs.org) installed. Then install the required node.js packages: `node install mocha zombie chai`. `chai` is a BDD assertion library for node and it allows you to easily declare the conditions you expect (verification points). If one of those expectations fails, the mocha test will fail.
-Add a file called mocha.opts and place it in the tests directory. The flag `--reporter spec` in the file sets the reporter to output the current test that runs. The flag `--recursive` tells Mocha to do a recursive search for `test` folders and execute the code in that directory. The content of the file should be:
+To start using Mocha, you must install [Node.js](http://nodejs.org). Next, install 
+the required node.js packages by typing: 
+````
+    node install mocha zombie chai
+````.
+
+`chai` is a BDD assertion library for node and it allows you to easily declare the 
+conditions (sometimes called expectations) that can make your test pass or fail (verification points).
+If one of the declated expectations fails, then the entire mocha test fails.
+You can add a file called `mocha.opts` and place it in the tests directory. 
+Add the following line to the `mocha.opts` file to set the reporter output 
+for the tests runner.
+ 
+````
+--reporter spec
+````
+ 
+Add the following line to the `mocha.opts` file to tell Mocha to do a recursive 
+search for `test` directories and execute the code in them. 
+
+````
+--recursive
+````
+
+
+The content of the `mocha.opts` file should be:
+
 ```js
 		--reporter spec
 		--recursive
 ```
+
 ### Writing the tests
-The tests are implemented in the file `TodoMVC-Example/test/functional.js`. In BDD style, you select some module as the test target. Then, you describe this module's functionality using common language. For example, letl's describe our Todo application. It is clear that the application should have the following properties:
+
+The tests are implemented in the `/test/functional.js` file. 
+In BDD style tests, you choose a module as the test target. Then, you describe 
+the module's functionality using common language. 
+For example, we describe our TodoMVC application as follows: 
+
 * it allows to add a new todo item
 * it shows how many items left to be done
 * can mark an item as completed
 
-In the `test` directory we can add the following skeleton.
+In the `test` directory we add the following skeleton implementation.
 
 ```js
 		describe("Todo application", function(){
@@ -619,11 +689,29 @@ In the `test` directory we can add the following skeleton.
 			it("can mark an item as completed")
 		})
 ```
-You can now run the tests by using `mocha` in the console. All the tests will be presented as "pending" since we did not provide an implementation. The implementation is done by manipulating the Zombie.js browser.
-Mocha provides a beforeEach() function which is being executed before each test. In this method we create a new browser instance; we do not reuse the browser to prevent interactions between different tests. We then use the `visit` method. 
 
-A very important pitfall in JavaScript testing is the wait issue. In traditional web page, the page DOM is constructed from the the Html file. In this case, if for example we run code in $(window).ready() function, all our DOM is gurenteed to be ready. However, in a single page JavaScript application, the Dom is built dynamically. This pose a difficulty for testing tools as they cannot know when the page was fully loaded and might try to execute code that interacts with the DOM, which would fail. Consider our todo application; when the application page is first loaded is doesn't contain the UI elements. Only then, RequireJS dynamically loads the text box which allows adding new items. If we consider our first test (adding new todo item); this test will probably fail, since the text box in which the user enters the new item doesn't exist immediatly after the page was loaded. 
-To handle this case we have to explicitly wait for some condition. In the tests, we check that an item with id `#new-todo` exists. We use it as indication that the JavaScript code executed and created the relevant DOM elements. 
+To run the tests, type `mocha` in the console. At this point, all the tests are presented 
+as "pending" since we did not provide an implementation. The implementation is done 
+by manipulating the Zombie.js browser object. Mocha provides a `beforeEach()` function 
+which is executed before each test. In this function we create a new browser instance; 
+we do not reuse the browser to prevent interactions between different tests. 
+We then use the `visit` method of the browser to navigate to a specific URL. 
+
+A very important pitfall in JavaScript acceptance testing is the wait issue. 
+In a traditional web page, the page DOM is constructed from an HTML file. In this case,
+when the code is in the $(window).ready() function, all the DOM is guaranteed to be 
+ready. However, in a single page JavaScript application, the DOM is built dynamically. 
+This poses a difficulty for testing tools as they cannot know when the page was fully 
+loaded. If the testing tool tries to execute code that interacts with the DOM before 
+it is fully loaded, the tests fails. Consider our TodoMVC application; when the 
+application page is first loaded is doesn't contain any UI elements. Only then, 
+RequireJS dynamically loads the `main_header_view` which allows adding new todos. 
+If we consider our first test (adding new todo item); it will probably fail, since 
+the text box in which the user enters the text for the todo item doesn't exist yet.
+To handle this case we have to explicitly wait for some condition to become satisfied. 
+In the tests, we check that an item with id `#new-todo` exists. We use it as 
+indication that the JavaScript code executed and created the relevant DOM elements. 
+
 ```js
 		function waitForPageLoadEnd(callback) {
 			that.browser.wait(function() {
@@ -632,7 +720,12 @@ To handle this case we have to explicitly wait for some condition. In the tests,
 		}
 ```
 
-A Mocha test function accepts a `done` function as paramter. It is the responsibility of the user to call this function when the test finishs its' execution. This is required due to JavaSctipt's async nature. It notifies the framework that all the relevnt code was executed and that it can now report the test as completed. If the `done` function is not invoked, Mocha will report the test as failed due to timeout. 
+A Mocha test function takes a `done` function as an argument. It is the 
+responsibility of the user to call this function when the 
+test finishes its execution. This is required due to Mocha's async nature. 
+The `done` function notifies the Mocha framework that all the relevant code was executed 
+and that it can now report the test as complete. If the `done` function is not 
+invoked in a timely manner, Mocha reports the test as failed due to timeout. 
 
 ```js
 		it("allows to add a new todo item", function(done) {
