@@ -1,0 +1,1 @@
+define(['backbone', 'marionette', 'underscore', 'hbs!./templates/main_welcome.hbs', './../controller'],

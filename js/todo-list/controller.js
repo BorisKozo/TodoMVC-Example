@@ -1,52 +1,70 @@
 ﻿/*global define*/
 
 define(['require', 'jquery', 'backbone', 'marionette', 'underscore', 'js/app', './models/todo_item_collection'],
-    function (require, $, Backbone, Marionette, _, App, TodoItemCollection) {
-        'use strict';
-        var Controller = Marionette.Controller.extend({
-            vent: _.extend({}, Backbone.Events),
+   function(require, $, Backbone, Marionette, _, App, TodoItemCollection) {
+       'use strict';
 
-            displayModes: {
-                all: 'All',
-                active: 'Active',
-                completed: 'Completed'
-            },
+       var initialize = function() {
+              var _this = controller,
+                 result = $.Deferred(),
+                 todosCollection = new TodoItemCollection(),
+                 todoPromise = todosCollection.fetch();
 
-            displayModeAll: function () {
-                this.displayMode = this.displayModes.all;
-                this.vent.trigger('displayModeChanged', this.displayMode);
-            },
+              require(['./views/main_layout_view', './views/footer_view', './router'], function(MainLayoutView, FooterView) {
+                  App.section.show(new MainLayoutView({ todosCollection: todosCollection }));
+                  App.footer.show(new FooterView());
+                  todoPromise.done(function() {
+                      _this.vent.trigger("todosUpdated", { collection: todosCollection });
+                  });
+                  result.resolve();
+              });
+              return result.promise();
+          },
 
-            displayModeActive: function () {
-                this.displayMode = this.displayModes.active;
-                this.vent.trigger('displayModeChanged', this.displayMode);
-            },
+          Controller = Marionette.Controller.extend({
+              vent: _.extend({}, Backbone.Events),
 
-            displayModeCompleted: function () {
-                this.displayMode = this.displayModes.completed;
-                this.vent.trigger('displayModeChanged', this.displayMode);
-            },
+              displayModes: {
+                  all: 'All',
+                  active: 'Active',
+                  completed: 'Completed'
+              },
 
+              displayModeAll: function() {
+                  var that = this;
+                  initialize().done(function() {
+                      that.displayMode = that.displayModes.all;
+                      that.vent.trigger('displayModeChanged', that.displayMode);
+                  });
+              },
 
+              displayModeActive: function() {
+                  var that = this;
+                  initialize().done(function() {
+                      that.displayMode = that.displayModes.active;
+                      that.vent.trigger('displayModeChanged', that.displayMode);
+                  });
+              },
 
-            start: function () {
-                var _this = this,
-                    result = $.Deferred(),
-                    todosCollection = new TodoItemCollection(),
-                    todoPromise = todosCollection.fetch();
+              displayModeCompleted: function() {
+                  var that = this;
+                  initialize().done(function() {
+                      that.displayMode = that.displayModes.completed;
+                      that.vent.trigger('displayModeChanged', that.displayMode);
+                  });
+              },
 
-                require(['./views/main_layout_view', './views/footer_view', './router'], function (MainLayoutView, FooterView) {
-                    App.section.show(new MainLayoutView({ todosCollection: todosCollection }));
-                    App.footer.show(new FooterView());
-                    todoPromise.done(function () {
-                        _this.vent.trigger("todosUpdated", { collection: todosCollection });
-                    });
-                    result.resolve();
-                });
-                return result.promise();
-            }
+              start: function() {
+                  var result = $.Deferred();
+                  require(['./views/main_layout_view', './views/footer_view', './router'], function() {
+                      result.resolve();
+                  });
+                  return result.promise();
+              }
 
-        });
+          }),
 
-        return new Controller();
-    });
+          controller = new Controller();
+
+       return controller;
+   });

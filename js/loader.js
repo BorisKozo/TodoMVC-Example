@@ -1,13 +1,17 @@
 ﻿/*global define*/
 
-define(['require', 'jquery', './app', './todo-list/controller'],
-    function (require, $, App) {
+define(['require', 'jquery', 'underscore', './app',
+    './todo-list/controller','./welcome/controller'],
+    function (require, $, _, App) {
         'use strict';
         var loader = {
             start: function () {
-                var controller = require('./todo-list/controller');
-                //Load and start all the controllers
-                $.when(controller.start()).then(function () {
+                var promises = [],
+                   controllers = ['./todo-list/controller', './welcome/controller'];
+                _(controllers).each(function(controllerName) {
+                    promises.push(require(controllerName).start());
+                });
+                $.when(promises).then(function () {
                     App.start();
                 });
             }
