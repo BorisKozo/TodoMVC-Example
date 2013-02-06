@@ -549,7 +549,20 @@ based on the current display mode.
             }
 ```
 										 
-Note how every view retains its responsibility and handles its own assets based on events on the EventBus. 
+**Note how every view retains its responsibility and handles its own assets based on events on the EventBus.**
+**This is a key element in good separation of concerns and modular application design.**
+
+* Allowing the user to remove all the completed todos with a single click. When there is one or more complete todo
+in the todos list, the `main_footer_view` displays a button which displays the number of complete todos. Clicking the button removes
+the todos from the list. At this point you should be able to figure out the implementation of this functionality. Clicking
+the "Clear completed" button does not affect the todos list directly because it is not the responsibility of the `main_footer_view` to do so.
+Instead, it triggers a `clearCompleted` event on the EventBus. The `main_content_view` is listening to this event and removes
+all the todos from the todos collection. Since the collection has changed, `main_content_view` triggers the `todosUpdated` event
+on the EventBus. The `main_footer_view` listens to the `todosUpdated` event and retenders itself according to the todos collection state, in this
+case hiding the "Clear completed" button.
+
+# Optimizing with r.js
+
 
 
 # Testing
