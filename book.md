@@ -662,7 +662,7 @@ To start using Mocha, you must install [Node.js](http://nodejs.org). Next, insta
 the required node.js packages by typing: 
 ````
     node install mocha zombie chai
-````.
+````
 
 `chai` is a BDD assertion library for node and it allows you to easily declare the 
 conditions (sometimes called expectations) that can make your test pass or fail (verification points).
