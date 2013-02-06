@@ -505,7 +505,7 @@ Add a file called mocha.opts and place it in the tests directory. The flag `--re
 		--recursive
 ```
 ### Writing the tests
-The tests are implemented in the file `TodoMVC-Example/test/functional.js`. In BDD style, you select some module as the test target. Then, you describe this module's functionality using common language. For example, let's describe our Todo application. It is clear that the application should have the following properties:
+The tests are implemented in the file `TodoMVC-Example/test/functional.js`. In BDD style, you select some module as the test target. Then, you describe this module's functionality using common language. For example, letl's describe our Todo application. It is clear that the application should have the following properties:
 * it allows to add a new todo item
 * it shows how many items left to be done
 * can mark an item as completed
