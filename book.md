@@ -486,6 +486,72 @@ transient models and therefore decided to store the two properties directly on t
         }
 ```
 
+* Allowing the user to filter between three views. The first view called "All" shows all the todos, the second
+called "Active" shows only the incomplete todos, and finally the third view called "Completed" shows only the completed
+todos which were not removed from the list. Since TodoMVC is a [single page application](http://en.wikipedia.org/wiki/Single-page_application)
+we are changing the filtering through internal routing using `Backbone.Router` or more specifically `Marionette.AppRouter` which extends 
+`Backbone.Router` and adds the controller connection to it. We capture three routes as defined by the TodoMVC specifications and route them
+to the appropriate functions in the controller.
+
+```js
+    var MainRouter = Marionette.AppRouter.extend({
+        appRoutes: {
+            '': 'displayModeAll',
+            'active': 'displayModeActive',
+            'completed': 'displayModeCompleted'
+        },
+        controller: controller
+    });
+```
+
+The tree functions implemented on the controller basically do the same thing: set the current display mode
+on the controller and trigger the `displayModeChanged` event on the EventBus.
+
+```js
+            displayModes: {
+                all: 'All',
+                active: 'Active',
+                completed: 'Completed'
+            },
+
+            displayModeAll: function () {
+                this.displayMode = this.displayModes.all;
+                this.vent.trigger('displayModeChanged', this.displayMode);
+            },
+
+            displayModeActive: function () {
+                this.displayMode = this.displayModes.active;
+                this.vent.trigger('displayModeChanged', this.displayMode);
+            },
+
+            displayModeCompleted: function () {
+                this.displayMode = this.displayModes.completed;
+                this.vent.trigger('displayModeChanged', this.displayMode);
+            }
+```
+
+The event is captured by the `main_footer_view` itself to update the selected caption
+of the appropriate view and by the `todo_item_view` to update the visibility of each item
+based on the current display mode.
+
+```js
+        onRender: function () {
+            var finishState = this.model.get('isFinished');
+
+            this.$el.removeClass('hidden');
+
+            if (controller.displayMode === controller.displayModes.active && finishState) {
+                this.$el.addClass('hidden');
+            }
+
+            if (controller.displayMode === controller.displayModes.completed && !finishState) {
+                this.$el.addClass('hidden');
+            }
+```
+
+Note how every view retains its responsibility and handles its own assets based on events on the EventBus. 
+
+
 # Testing
 
 ### Setting the environment

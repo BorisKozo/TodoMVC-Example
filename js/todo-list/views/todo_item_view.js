@@ -76,11 +76,11 @@ define(['marionette', 'hbs!./templates/todo_item', './../controller'], function 
             this.$el.removeClass('hidden');
             this.$el.removeClass('editing');
 
-            if (controller.displayMode === controller.displayModes.active && this.model.get('isFinished')) {
+            if (controller.displayMode === controller.displayModes.active && finishState) {
                 this.$el.addClass('hidden');
             }
 
-            if (controller.displayMode === controller.displayModes.completed && !this.model.get('isFinished')) {
+            if (controller.displayMode === controller.displayModes.completed && !finishState) {
                 this.$el.addClass('hidden');
             }
 
