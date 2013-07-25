@@ -661,7 +661,7 @@ The tests are running in the [Zombie.js](http://zombie.labnotes.org/) browser wh
 To start using Mocha, you must install [Node.js](http://nodejs.org). Next, install 
 the required node.js packages by typing: 
 ````
-    node install mocha zombie chai
+    npm install mocha zombie chai
 ````
 
 `chai` is a BDD assertion library for node and it allows you to easily declare the 
